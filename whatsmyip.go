@@ -145,27 +145,23 @@ func fetchURL(ctx context.Context, url string, ch chan<- string) {
 
 // parseIP extracts an IP address from a given string.
 //
-// The function handles various formats of input:
-//  1. Single-line responses: Returns the entire string as the IP.
-//  2. Multi-line responses: Searches for a line starting with "ip=".
-//  3. Special case: For a two-line response where the second line is empty,
-//     it returns either the "ip=" value or the first line.
+// Splits the string into lines and tries to parse each line as an IP.
 //
 // The function is case-insensitive, converting all input to lowercase before processing.
+// If a line starts with "ip=", it removes the prefix before parsing.
 //
 // Parameters:
 //   - s: A string containing the potential IP address.
 //
 // Returns:
 //   - string: The extracted IP address.
-//   - error: An error if no IP address is found or if the response is empty.
+//   - error: An error if no valid IP address is found.
 //
 // Error cases:
-//   - Returns an error if the input string is empty.
-//   - Returns an error if no IP address is found in a multi-line input.
+//   - Returns an error if no valid IP address is found in the input string.
 //
-// Note: This function assumes that a single-line response always contains a valid IP address.
-// It may return unexpected results if this assumption is not met.
+// Note: This function does not assume that a single-line response always contains a valid IP address.
+// It tries to parse all input as an IP address, regardless of the format.
 func parseIP(s string) (string, error) {
 	s = strings.ToLower(s)
 	lines := strings.Split(s, "\n")
