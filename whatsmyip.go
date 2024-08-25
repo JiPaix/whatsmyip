@@ -95,7 +95,6 @@ func Get() (ip string, url string, err error) {
 			return result, urls[i], nil
 		}
 	}
-	log.Error("All requests failed")
 	return "", "", fmt.Errorf("all requests failed")
 }
 
