@@ -110,6 +110,7 @@ func Get() (ip string, source string, err error) {
 	for i := 0; i < len(urls); i++ {
 		result := <-ch
 		if result != "" {
+			cancel()
 			log.Debug("Fetch completed", "elapsed", time.Since(start).String(), "pos", i, "url", urls[i])
 			return result, urls[i], nil
 		}
