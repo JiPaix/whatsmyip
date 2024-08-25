@@ -14,6 +14,7 @@ import (
 	"io"
 	"math"
 	"math/rand/v2"
+	"net"
 	"net/http"
 	"os"
 	"strings"
@@ -133,7 +134,7 @@ func fetchURL(ctx context.Context, url string, ch chan<- string) {
 		return
 	}
 
-	ip, err := getIP(string(body))
+	ip, err := parseIP(string(body))
 	if err != nil {
 		ch <- ""
 		return
@@ -142,7 +143,7 @@ func fetchURL(ctx context.Context, url string, ch chan<- string) {
 	ch <- ip
 }
 
-// getIP extracts an IP address from a given string.
+// parseIP extracts an IP address from a given string.
 //
 // The function handles various formats of input:
 //  1. Single-line responses: Returns the entire string as the IP.
@@ -165,31 +166,15 @@ func fetchURL(ctx context.Context, url string, ch chan<- string) {
 //
 // Note: This function assumes that a single-line response always contains a valid IP address.
 // It may return unexpected results if this assumption is not met.
-func getIP(s string) (string, error) {
-	s = strings.ToLower(s) // Convert to lowercase for case-insensitive matching
-	if strings.Contains(s, "\n") {
-		lines := strings.Split(s, "\n")
+func parseIP(s string) (string, error) {
+	s = strings.ToLower(s)
+	lines := strings.Split(s, "\n")
 
-		if len(lines) == 0 {
-			log.Error("Empty response")
-			return "", fmt.Errorf("empty response")
+	for _, line := range lines {
+		line = strings.TrimPrefix(line, "ip=")
+		if netIP := net.ParseIP(line); netIP != nil {
+			return netIP.String(), nil
 		}
-
-		if len(lines) == 2 && lines[1] == "" {
-			if strings.HasPrefix(lines[0], "ip=") {
-				return strings.TrimPrefix(lines[0], "ip="), nil
-			} else {
-				return lines[0], nil
-			}
-		}
-
-		for _, line := range lines {
-			if strings.HasPrefix(line, "ip=") {
-				return strings.TrimPrefix(line, "ip="), nil
-			}
-		}
-	} else {
-		return s, nil
 	}
 	return "", fmt.Errorf("no ip address found")
 }
