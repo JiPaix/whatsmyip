@@ -1,6 +1,7 @@
 package whatsmyip
 
 import (
+	"fmt"
 	"net"
 	"os/exec"
 	"runtime"
@@ -78,4 +79,14 @@ func TestGetWithBadURL(t *testing.T) {
 	if err == nil {
 		t.Errorf("expected error, got nil")
 	}
+}
+
+func ExampleGet() {
+	ip, url, err := Get()
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		panic(err.Error())
+	}
+	fmt.Printf("Your IP address is: %s\n", ip)
+	fmt.Printf("Retrieved from: %s\n", url)
 }
