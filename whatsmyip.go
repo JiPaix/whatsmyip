@@ -89,7 +89,11 @@ func getIP(s string) (string, error) {
 	return "", fmt.Errorf("no ip address found")
 }
 
-func Get(urls []string) (ip string, from string, err error) {
+// Get fetches the external IP address of the machine from multiple URLs
+// It tries to fetch the IP address from multiple URLs
+// and returns the first successful response
+// ip returns the public ip
+func Get() (ip string, source string, err error) {
 	start := time.Now()
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -112,7 +116,7 @@ func Get(urls []string) (ip string, from string, err error) {
 		}
 	}
 	log.Error("All requests failed")
-	return "", "", fmt.Errorf("All requests failed")
+	return "", "", fmt.Errorf("all requests failed")
 }
 
 func setupLogger() *l.Logger {
